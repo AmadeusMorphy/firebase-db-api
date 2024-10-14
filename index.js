@@ -2,7 +2,6 @@
 
 
 
-
 // Import the Firebase Admin SDK and Express
 const admin = require('firebase-admin');
 const express = require('express');
@@ -10,11 +9,13 @@ const express = require('express');
 // Initialize Express app
 const app = express();
 
-// Initialize Firebase Admin with your service account key
-const serviceAccount = require('./mrnzd-d0f4d-firebase-adminsdk-pebej-fc7cf9f4e0.json');
-
+// Initialize Firebase Admin using environment variables
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+  credential: admin.credential.cert({
+    project_id: process.env.FIREBASE_PROJECT_ID,
+    private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+    client_email: process.env.FIREBASE_CLIENT_EMAIL,
+  })
 });
 
 // Firestore reference
@@ -47,6 +48,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 
