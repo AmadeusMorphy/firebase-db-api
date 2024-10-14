@@ -1,34 +1,133 @@
+
+
+
+
+
+// Import the Firebase Admin SDK and Express
 const admin = require('firebase-admin');
+const express = require('express');
+
+// Initialize Express app
+const app = express();
+
+// Initialize Firebase Admin with your service account key
+const serviceAccount = require('./mrnzd-d0f4d-firebase-adminsdk-pebej-fc7cf9f4e0.json');
 
 admin.initializeApp({
-    credential: admin.credential.cert({
-        type: process.env.FIREBASE_TYPE,
-        project_id: process.env.FIREBASE_PROJECT_ID,
-        private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
-        private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-        client_email: process.env.FIREBASE_CLIENT_EMAIL,
-        client_id: process.env.FIREBASE_CLIENT_ID,
-        auth_uri: process.env.FIREBASE_AUTH_URI,
-        token_uri: process.env.FIREBASE_TOKEN_URI,
-        auth_provider_x509_cert_url: process.env.FIREBASE_AUTH_PROVIDER_CERT_URL,
-        client_x509_cert_url: process.env.FIREBASE_CLIENT_CERT_URL
-    })
+  credential: admin.credential.cert(serviceAccount)
 });
 
-const express = require('express');
-const app = express();
-const port = process.env.PORT || 3000;
+// Firestore reference
+const db = admin.firestore();
 
+// Function to get users from the 'users' collection
+async function getUsers() {
+  try {
+    const usersSnapshot = await db.collection('users').get();
+    const users = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return users;
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    throw error;
+  }
+}
+
+// Set up the `/data` route to respond with the users collection
 app.get('/data', async (req, res) => {
-    try {
-        const snapshot = await admin.firestore().collection('users').get();
-        const data = snapshot.docs.map(doc => doc.data());
-        res.status(200).json(data);
-    } catch (error) {
-        res.status(500).send('Error retrieving data: ' + error.message);
-    }
+  try {
+    const users = await getUsers();
+    res.json(users);  // Send users data as JSON
+  } catch (error) {
+    res.status(500).send('Error retrieving data');
+  }
 });
 
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
+// Start the server on port 3000
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// // Import the Firebase Admin SDK
+// const admin = require('firebase-admin');
+
+// // Initialize the app with your service account key
+// const serviceAccount = require('./mrnzd-d0f4d-firebase-adminsdk-pebej-fc7cf9f4e0.json');
+
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount)
+// });
+
+// // Firestore reference
+// const db = admin.firestore();
+
+// // Function to get users from the 'users' collection
+// async function getUsers() {
+//   try {
+//     const usersSnapshot = await db.collection('users').get();
+//     const users = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+//     console.log('Users:', users);  // Display users
+//   } catch (error) {
+//     console.error('Error fetching users:', error);
+//   }
+// }
+
+// // Call the function to get and display users
+// getUsers();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
