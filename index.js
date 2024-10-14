@@ -5,6 +5,7 @@
 // Import the Firebase Admin SDK and Express
 const admin = require('firebase-admin');
 const express = require('express');
+require('dotenv').config();  // Load .env file
 
 // Initialize Express app
 const app = express();
@@ -48,8 +49,6 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
-
 
 
 
